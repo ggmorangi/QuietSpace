@@ -2,10 +2,25 @@ const https = require('https');
 
 exports.handler = async function(event, context) {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { 
+      statusCode: 405, 
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
   }
 
-  const { messages, system } = JSON.parse(event.body);
+  let messages, system;
+  
+  try {
+    const body = JSON.parse(event.body);
+    messages = body.messages;
+    system = body.system;
+  } catch(e) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Invalid request body' })
+    };
+  }
 
   const payload = JSON.stringify({
     model: 'claude-sonnet-4-20250514',
@@ -14,7 +29,7 @@ exports.handler = async function(event, context) {
     messages
   });
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const options = {
       hostname: 'api.anthropic.com',
       path: '/v1/messages',
@@ -42,6 +57,7 @@ exports.handler = async function(event, context) {
     req.on('error', (e) => {
       resolve({
         statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: e.message })
       });
     });
