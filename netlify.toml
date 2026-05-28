@@ -1,0 +1,3 @@
+[build]
+  command = "sed -i 's/YOUR_API_KEY_HERE/'\"$ANTHROPIC_API_KEY\"'/g' doors.html"
+  publish = "."
