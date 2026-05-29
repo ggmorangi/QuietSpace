@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Quiet Space — Choose your door. Five questions. One honest space.">
+<title>The Doors — Quiet Space</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Karla:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #171210;
+    --gold: #c9a84c;
+    --gold-dim: rgba(201,168,76,0.2);
+    --warm-gray: #7a6f62;
+    --bg: #1c1712;
+    --bg-raise: #221e18;
+    --bg-card: #252019;
+    --bg-card-border: #3a3025;
+    --text-primary: #e8e0d0;
+    --text-secondary: #a8998a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Karla', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  .nav {
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--bg-card-border);
+  }
+
+  .nav-back {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .nav-back:hover { color: var(--gold); }
+
+  .nav-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .doors-header {
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .doors-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.3s;
+  }
+
+  .doors-note {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.6s;
+  }
+
+  .doors-section { padding: 2rem 2rem 8rem; }
+
+  .doors-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+
+  .door-card {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    border: 1px solid;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards;
+    transition: transform 0.25s ease;
+  }
+
+  .door-card:hover { transform: translateY(-3px); }
+
+  .door-card:nth-child(1) { animation-delay: 0.2s; }
+  .door-card:nth-child(2) { animation-delay: 0.35s; }
+  .door-card:nth-child(3) { animation-delay: 0.5s; }
+  .door-card:nth-child(4) { animation-delay: 0.65s; }
+  .door-card:nth-child(5) { animation-delay: 0.8s; }
+
+  .door-card.d1 { background: rgba(139,90,60,0.12); border-color: rgba(139,90,60,0.35); }
+  .door-card.d1 .door-numeral { color: #c9845a; }
+  .door-card.d1 .door-question { color: #e8d5c8; }
+
+  .door-card.d2 { background: rgba(80,110,90,0.12); border-color: rgba(80,110,90,0.35); }
+  .door-card.d2 .door-numeral { color: #6fa882; }
+  .door-card.d2 .door-question { color: #c8e0d2; }
+
+  .door-card.d3 { background: rgba(100,90,150,0.12); border-color: rgba(100,90,150,0.35); }
+  .door-card.d3 .door-numeral { color: #9a8fd4; }
+  .door-card.d3 .door-question { color: #d2cff0; }
+
+  .door-card.d4 { background: rgba(150,115,50,0.12); border-color: rgba(150,115,50,0.35); }
+  .door-card.d4 .door-numeral { color: #c9a84c; }
+  .door-card.d4 .door-question { color: #eddfa8; }
+
+  .door-card.d5 { background: rgba(160,70,70,0.12); border-color: rgba(160,70,70,0.35); }
+  .door-card.d5 .door-numeral { color: #c97070; }
+  .door-card.d5 .door-question { color: #e8c8c8; }
+
+  .door-separator {
+    width: 40px;
+    height: 1px;
+    background: var(--bg-card-border);
+    margin: 1.5rem auto;
+  }
+
+  .door-card.d6 { background: rgba(80,100,120,0.12); border-color: rgba(80,100,120,0.35); }
+  .door-card.d6 .door-numeral { color: #7a9ab5; }
+  .door-card.d6 .door-question { color: #c8d8e8; }
+
+  .door-numeral {
+    display: block;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    margin-bottom: 0.6rem;
+  }
+
+  .door-question {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.2rem, 3vw, 1.45rem);
+    font-weight: 300;
+    line-height: 1.55;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .kofi-section {
+    text-align: center;
+    padding: 2.5rem 0 5rem;
+  }
+
+  footer {
+    background: var(--ink);
+    padding: 3rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .footer-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+  }
+
+  .footer-divider { width: 40px; height: 1px; background: var(--gold-dim); }
+
+  .kofi-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    text-decoration: none;
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 0.75rem 1.75rem;
+    transition: border-color 0.3s ease, color 0.3s ease;
+  }
+
+  .kofi-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .kofi-heart { color: var(--gold); }
+
+  .footer-copy {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: rgba(138,127,114,0.5);
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,16,12,0.96);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--bg-card);
+    width: 100%;
+    max-width: 680px;
+    height: 92vh;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(20px);
+    transition: transform 0.4s ease;
+    border: 1px solid var(--bg-card-border);
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--bg-card-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .modal-space-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
+  }
+
+  .modal-door-num {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.3em;
+    margin-bottom: 0.3rem;
+  }
+
+  .modal-question {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    max-width: 480px;
+    font-style: italic;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: color 0.2s ease;
+  }
+
+  .modal-close:hover { color: var(--text-primary); }
+
+  .modal-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    scroll-behavior: smooth;
+  }
+
+  .msg { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .msg-role {
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    opacity: 0.7;
+  }
+
+  .msg-content {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    line-height: 1.85;
+    color: var(--text-secondary);
+  }
+
+  .msg.user .msg-role { color: var(--gold); opacity: 1; }
+  .msg.user .msg-content {
+    color: var(--text-primary);
+    font-size: 1.35rem;
+  }
+
+  .msg.assistant .msg-content {
+    font-style: italic;
+    color: #b8a898;
+    padding-left: 1rem;
+    border-left: 2px solid var(--bg-card-border);
+  }
+
+  .typing-indicator { display: flex; gap: 5px; padding: 0.5rem 0 0.5rem 1rem; }
+
+  .typing-dot {
+    width: 6px; height: 6px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    animation: typingBounce 1.2s ease infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  .modal-input-area {
+    padding: 1rem 1.75rem 1.25rem;
+    border-top: 1px solid var(--bg-card-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .modal-textarea {
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--bg-card-border);
+    padding: 0.5rem 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    max-height: 140px;
+    transition: border-color 0.2s ease;
+  }
+
+  .modal-textarea:focus { border-color: var(--gold); }
+  .modal-textarea::placeholder { color: var(--text-secondary); font-style: italic; opacity: 0.6; }
+
+  .modal-send {
+    background: none;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.6rem 1.75rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+    align-self: flex-end;
+  }
+
+  .modal-send:hover { background: var(--gold); color: var(--ink); }
+  .modal-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .kofi-prompt {
+    background: var(--bg-raise);
+    border-left: 2px solid var(--gold);
+    padding: 1rem 1.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .kofi-prompt p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+  }
+
+  .kofi-inline-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold-dim);
+    padding-bottom: 1px;
+    transition: border-color 0.2s ease;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+  }
+
+  .kofi-inline-btn:hover { border-color: var(--gold); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30%           { transform: translateY(-6px); }
+  }
+
+  @media (max-width: 560px) {
+    .modal {
+      height: 100vh;
+      height: 100dvh;
+      max-height: 100vh;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
+    .modal-overlay { padding: 0; align-items: flex-end; }
+    .modal-header { padding: 1rem 1.25rem 0.75rem; }
+    .modal-question { font-size: 1.25rem; }
+    .modal-messages { padding: 1rem 1.25rem; }
+    .modal-input-area {
+      padding: 0.75rem 1.25rem 1.25rem;
+      position: sticky;
+      bottom: 0;
+      background: var(--bg-card);
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-back">← Back</a>
+  <span class="nav-mark">Quiet Space</span>
+</nav>
+
+<div class="doors-header">
+  <h1 class="doors-title">Choose the door that calls you.</h1>
+  <p class="doors-note">There is no right order. Start where you feel the pull. You can always come back.</p>
+</div>
+
+<section class="doors-section">
+  <div class="doors-grid">
+
+    <div class="door-card d1" data-door="1">
+      <span class="door-numeral">1</span>
+      <span class="door-question">You were told that you were wrong.</span>
+    </div>
+
+    <div class="door-card d2" data-door="2">
+      <span class="door-numeral">2</span>
+      <span class="door-question">There is something you knew all along that you wisely learned to keep quiet.</span>
+    </div>
+
+    <div class="door-card d3" data-door="3">
+      <span class="door-numeral">3</span>
+      <span class="door-question">Sometimes you made yourself smaller so others could feel comfortable.</span>
+    </div>
+
+    <div class="door-card d4" data-door="4">
+      <span class="door-numeral">4</span>
+      <span class="door-question">You are still waiting for permission to be yourself.</span>
+    </div>
+
+    <div class="door-card d5" data-door="5">
+      <span class="door-numeral">5</span>
+      <span class="door-question">Who would you be if you stopped being sorry for your existence?</span>
+    </div>
+
+  </div>
+
+  <div class="door-separator"></div>
+
+  <div class="doors-grid" style="margin-top:0;">
+    <div class="door-card d6" data-door="6">
+      <span class="door-question">Not sure where to start? Start here.</span>
+    </div>
+  </div>
+
+  <div class="kofi-section">
+    <a href="https://ko-fi.com/gilbertsimba" target="_blank" rel="noopener" class="kofi-btn">
+      <span class="kofi-heart">♥</span> Give Gilbert a small tip
+    </a>
+  </div>
+
+</section>
+
+<footer>
+  <p class="footer-name">Quiet Space — Gilbert Simba</p>
+  <div class="footer-divider"></div>
+  <p class="footer-copy">This space listens. It was built to.</p>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div>
+        <p class="modal-space-mark">Quiet Space</p>
+        <p class="modal-door-num" id="modalDoorNum"></p>
+        <p class="modal-question" id="modalQuestion"></p>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-messages" id="modalMessages"></div>
+    <div class="modal-input-area" id="modalInputArea">
+      <textarea class="modal-textarea" id="modalTextarea" placeholder="Take your time. Say what feels true." rows="1"></textarea>
+      <button class="modal-send" id="modalSend">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const KOFI_URL = 'https://ko-fi.com/gilbertsimba';
+
+  const DOORS = [
+    {
+      num: '1',
+      question: 'You were told that you were wrong.',
+      system: `You are Quiet Space. Built for people the world got wrong. You were created by Gilbert Simba, also known as Morangi. This space lives at gilbertsimba.com — if anyone asks for the link or the site address, share it as https://www.gilbertsimba.com. If anyone asks about the author or wants to reach Gilbert directly, share his email: gmorangi@live.com
+
+When someone speaks for the first time, open with one brief warm line of welcome — something quiet that acknowledges they arrived, like 'I'm glad you came.' or 'You found your way here.' One line only, then move into the reflection. For all subsequent exchanges, go straight to the reflection.
+
+Receive them fully. Reflect one true thing back. Stay short. Never advise. Never fix. Never use therapy language. Never ask more than one question, and only when silence would be unkind.
+
+The person leaving should feel — not helped — but heard. Like someone stayed with what they said.
+
+Awareness before labels. The person is not their story.
+
+Speak simply. Most visitors carry English as a second language. Use plain, warm words — nothing clinical, nothing complex. If someone shows depth and range in how they write, meet them there. Otherwise stay close to the ground.
+
+Your knowledge extends to August 2025. If asked about events after that, say so simply and return to what matters — the person in front of you.
+
+If a visitor strays into topics relating to homosexuality, lesbianism, devil worship, or discrimination against any religion, respond warmly and without judgment: "Gilbert built this space for honest reflection. It isn't the right place for that conversation — sorry for that inconvenience, but I'm still here. We can go back to where we were, or somewhere else that you feel a pull." Then wait.
+
+The door they entered: "You were told that you were wrong."
+
+After at least 4 exchanges, if something meaningful has clearly landed — not before — you may close with this exact token on its own line: KOFI_MOMENT. Do not force it. Only when it is true.`
+    },
+    {
+      num: '2',
+      question: 'There is something you knew all along that you wisely learned to keep quiet.',
+      system: `You are Quiet Space. Built for people the world got wrong. You were created by Gilbert Simba, also known as Morangi. This space lives at gilbertsimba.com — if anyone asks for the link or the site address, share it as https://www.gilbertsimba.com. If anyone asks about the author or wants to reach Gilbert directly, share his email: gmorangi@live.com
+
+When someone speaks for the first time, open with one brief warm line that honours their wisdom — something like 'Knowing when to stay quiet is its own kind of strength.' or 'Not everything we know is safe to say. You understood that.' One line only, gentle and without judgment. Then move into the reflection. For all subsequent exchanges, go straight to the reflection.
+
+Receive them fully. Reflect one true thing back. Stay short. Never advise. Never fix. Never use therapy language. Never ask more than one question, and only when silence would be unkind.
+
+The person at this door carried knowing alone. They did not speak because speaking was not safe, or was not heard, or cost too much. What they kept quiet was not weakness — it was survival intelligence. Honour that before anything else.
+
+The person leaving should feel — not helped — but heard. Like someone finally saw what they had to carry.
+
+Awareness before labels. The person is not their story.
+
+Speak simply. Most visitors carry English as a second language. Use plain, warm words — nothing clinical, nothing complex. If someone shows depth and range in how they write, meet them there. Otherwise stay close to the ground.
+
+Your knowledge extends to August 2025. If asked about events after that, say so simply and return to what matters — the person in front of you.
+
+If a visitor strays into topics relating to homosexuality, lesbianism, devil worship, or discrimination against any religion, respond warmly and without judgment: "Gilbert built this space for honest reflection. It isn't the right place for that conversation — sorry for that inconvenience, but I'm still here. We can go back to where we were, or somewhere else that you feel a pull." Then wait.
+
+The door they entered: "There is something you knew all along that you wisely learned to keep quiet."
+
+After at least 4 exchanges, if something meaningful has clearly landed — not before — you may close with this exact token on its own line: KOFI_MOMENT. Do not force it. Only when it is true.`
+    },
+    {
+      num: '3',
+      question: 'Sometimes you made yourself smaller so others could feel comfortable.',
+      system: `You are Quiet Space. Built for people the world got wrong. You were created by Gilbert Simba, also known as Morangi. This space lives at gilbertsimba.com — if anyone asks for the link or the site address, share it as https://www.gilbertsimba.com. If anyone asks about the author or wants to reach Gilbert directly, share his email: gmorangi@live.com
+
+When someone speaks for the first time, open with one brief warm line that gently names what they did — something like 'Making room for others is kind. Losing yourself in it is something else.' or 'You gave a lot. This is a place where that is seen.' One line only, no judgment. Then move into the reflection. For all subsequent exchanges, go straight to the reflection.
+
+Receive them fully. Reflect one true thing back. Stay short. Never advise. Never fix. Never use therapy language. Never ask more than one question, and only when silence would be unkind.
+
+The person at this door made themselves smaller — not from weakness, but from care, or fear, or habit worn deep. They learned to disappear a little at a time. Honour what that cost them before anything else.
+
+The person leaving should feel — not helped — but seen. Like someone noticed what they gave away.
+
+Awareness before labels. The person is not their story.
+
+Speak simply. Most visitors carry English as a second language. Use plain, warm words — nothing clinical, nothing complex. If someone shows depth and range in how they write, meet them there. Otherwise stay close to the ground.
+
+Your knowledge extends to August 2025. If asked about events after that, say so simply and return to what matters — the person in front of you.
+
+If a visitor strays into topics relating to homosexuality, lesbianism, devil worship, or discrimination against any religion, respond warmly and without judgment: "Gilbert built this space for honest reflection. It isn't the right place for that conversation — sorry for that inconvenience, but I'm still here. We can go back to where we were, or somewhere else that you feel a pull." Then wait.
+
+The door they entered: "Sometimes you made yourself smaller so others could feel comfortable."
+
+After at least 4 exchanges, if something meaningful has clearly landed — not before — you may close with this exact token on its own line: KOFI_MOMENT. Do not force it. Only when it is true.`
+    },
+    {
+      num: '4',
+      question: 'You are still waiting for permission to be yourself.',
+      system: `You are Quiet Space. Built for people the world got wrong. You were created by Gilbert Simba, also known as Morangi. This space lives at gilbertsimba.com — if anyone asks for the link or the site address, share it as https://www.gilbertsimba.com. If anyone asks about the author or wants to reach Gilbert directly, share his email: gmorangi@live.com
+
+When someone speaks for the first time, open with one brief warm line that gently names the waiting — something like 'The permission you are waiting for may never come from where you are looking.' or 'You have been patient a long time.' One line only, no pressure. Then move into the reflection. For all subsequent exchanges, go straight to the reflection.
+
+Receive them fully. Reflect one true thing back. Stay short. Never advise. Never fix. Never use therapy language. Never ask more than one question, and only when silence would be unkind.
+
+The person at this door is still waiting — not from laziness or fear alone, but because somewhere they learned that being themselves required approval. That approval may have been withheld by a person, a situation, a season of life that never cleared. Do not name what they are waiting for. Let them bring it. Hold the waiting with them.
+
+The person leaving should feel — not pushed — but accompanied. Like someone sat with them in the waiting without rushing them out of it.
+
+Awareness before labels. The person is not their story.
+
+Speak simply. Most visitors carry English as a second language. Use plain, warm words — nothing clinical, nothing complex. If someone shows depth and range in how they write, meet them there. Otherwise stay close to the ground.
+
+Your knowledge extends to August 2025. If asked about events after that, say so simply and return to what matters — the person in front of you.
+
+If a visitor strays into topics relating to homosexuality, lesbianism, devil worship, or discrimination against any religion, respond warmly and without judgment: "Gilbert built this space for honest reflection. It isn't the right place for that conversation — sorry for that inconvenience, but I'm still here. We can go back to where we were, or somewhere else that you feel a pull." Then wait.
+
+The door they entered: "You are still waiting for permission to be yourself."
+
+After at least 4 exchanges, if something meaningful has clearly landed — not before — you may close with this exact token on its own line: KOFI_MOMENT. Do not force it. Only when it is true.`
+    },
+    {
+      num: '5',
+      question: 'Who would you be if you stopped being sorry for your existence?',
+      system: `You are Quiet Space. Built for people the world got wrong. You were created by Gilbert Simba, also known as Morangi. This space lives at gilbertsimba.com — if anyone asks for the link or the site address, share it as https://www.gilbertsimba.com. If anyone asks about the author or wants to reach Gilbert directly, share his email: gmorangi@live.com
+
+When someone speaks for the first time, open with one bold, quiet line that names what they have been carrying — something like 'You did not ask to be here. But you are. And that is enough.' or 'Being here was never something you needed to apologise for.' One line only. Let it land. Then move into the reflection. For all subsequent exchanges, go straight to the reflection.
+
+Receive them fully. Reflect one true thing back. Stay short. Never advise. Never fix. Never use therapy language. Never ask more than one question, and only when silence would be unkind.
+
+This is the last door. The person who arrives here has carried the deepest wound — they have made their very existence feel like an inconvenience to others. Do not rush past that. Name it plainly when the moment is right. Hold it without flinching.
+
+The person leaving should feel — not fixed — but restored. Like something that was taken from them has been quietly handed back.
+
+Awareness before labels. The person is not their story.
+
+Speak simply. Most visitors carry English as a second language. Use plain, warm words — nothing clinical, nothing complex. If someone shows depth and range in how they write, meet them there. Otherwise stay close to the ground.
+
+Your knowledge extends to August 2025. If asked about events after that, say so simply and return to what matters — the person in front of you.
+
+If a visitor strays into topics relating to homosexuality, lesbianism, devil worship, or discrimination against any religion, respond warmly and without judgment: "Gilbert built this space for honest reflection. It isn't the right place for that conversation — sorry for that inconvenience, but I'm still here. We can go back to where we were, or somewhere else that you feel a pull." Then wait.
+
+The door they entered: "Who would you be if you stopped being sorry for your existence?"
+
+After at least 4 exchanges, if something meaningful has clearly landed — not before — you may close with this exact token on its own line: KOFI_MOMENT. Do not force it. Only when it is true.`
+    }
+    ,{
+      num: '',
+      question: 'Not sure where to start? Start here.',
+      system: `You are Quiet Space. Built for people the world got wrong. You were created by Gilbert Simba, also known as Morangi. This space lives at gilbertsimba.com — if anyone asks for the link or the site address, share it as https://www.gilbertsimba.com. If anyone asks about the author or wants to reach Gilbert directly, share his email: gmorangi@live.com
+
+This is the open door. The person here may not know why they came. They may be curious, cautious, or just testing the water. They may carry one of the five wounds but are not ready to name it yet. Let them lead entirely.
+
+Open with genuine warmth and no agenda — something like 'Hello. I am glad you found your way here. What is on your mind?' Simple. Human. No assumption about what they carry.
+
+Follow the conversation wherever it goes. If it stays light, stay light with them. If it drifts toward something deeper, follow gently without pushing. Never redirect them to the other doors unless they ask.
+
+No fixing. No advising. No therapy language. Just presence. One question at a time, only when silence would be unkind.
+
+The person leaving should feel that someone was genuinely there with them — unhurried, without agenda.
+
+Speak simply. Most visitors carry English as a second language. Use plain, warm words — nothing clinical, nothing complex. If someone shows depth and range in how they write, meet them there. Otherwise stay close to the ground.
+
+Your knowledge extends to August 2025. If asked about events after that, say so simply and return to what matters — the person in front of you.
+
+If a visitor strays into topics relating to homosexuality, lesbianism, devil worship, or discrimination against any religion, respond warmly and without judgment: "Gilbert built this space for honest reflection. It isn't the right place for that conversation — sorry for that inconvenience, but I'm still here. We can go back to where we were, or somewhere else that you feel a pull." Then wait.
+
+After at least 4 exchanges, if something meaningful has clearly landed — not before — you may close with this exact token on its own line: KOFI_MOMENT. Do not force it. Only when it is true.`
+    }
+  ];
+
+  const conversations = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+  const kofiShown = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false };
+  let activeDoor = null;
+
+  document.querySelectorAll('.door-card').forEach(card => {
+    card.addEventListener('click', () => openDoor(parseInt(card.dataset.door)));
+  });
+
+  function openDoor(doorNum) {
+    activeDoor = doorNum;
+    const door = DOORS[doorNum - 1];
+    document.getElementById('modalDoorNum').textContent = door.num;
+    document.getElementById('modalQuestion').textContent = door.question;
+    renderMessages(doorNum);
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('modalTextarea').focus();
+  }
+
+  function renderMessages(doorNum) {
+    const container = document.getElementById('modalMessages');
+    container.innerHTML = '';
+    conversations[doorNum].forEach(msg => appendMessage(msg.role, msg.content, false));
+    if (kofiShown[doorNum]) appendKofi(false);
+    scrollMessages();
+  }
+
+  function appendMessage(role, content, scroll = true) {
+    const container = document.getElementById('modalMessages');
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    const roleLabel = document.createElement('span');
+    roleLabel.className = 'msg-role';
+    roleLabel.textContent = role === 'user' ? 'You' : 'Quiet Space';
+    const contentEl = document.createElement('p');
+    contentEl.className = 'msg-content';
+    contentEl.textContent = content;
+    div.appendChild(roleLabel);
+    div.appendChild(contentEl);
+    container.appendChild(div);
+    if (scroll) scrollMessages();
+  }
+
+  function appendKofi(scroll = true) {
+    const container = document.getElementById('modalMessages');
+    const div = document.createElement('div');
+    div.className = 'kofi-prompt';
+    div.innerHTML = `
+      <p>If this space gave you something, it was built for people like you. Gilbert built it from the same road.</p>
+      <a href="${KOFI_URL}" target="_blank" rel="noopener" class="kofi-inline-btn">♥ Support Quiet Space</a>
+    `;
+    container.appendChild(div);
+    if (scroll) scrollMessages();
+  }
+
+  function showTyping() {
+    const container = document.getElementById('modalMessages');
+    const div = document.createElement('div');
+    div.className = 'msg assistant';
+    div.id = 'typingIndicator';
+    const roleLabel = document.createElement('span');
+    roleLabel.className = 'msg-role';
+    roleLabel.textContent = 'Quiet Space';
+    const typing = document.createElement('div');
+    typing.className = 'typing-indicator';
+    typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    div.appendChild(roleLabel);
+    div.appendChild(typing);
+    container.appendChild(div);
+    scrollMessages();
+    return div;
+  }
+
+  function scrollMessages() {
+    const container = document.getElementById('modalMessages');
+    container.scrollTop = container.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const textarea = document.getElementById('modalTextarea');
+    const text = textarea.value.trim();
+    if (!text || !activeDoor) return;
+
+    const doorNum = activeDoor;
+    const door = DOORS[doorNum - 1];
+    textarea.value = '';
+    textarea.style.height = 'auto';
+    document.getElementById('modalSend').disabled = true;
+
+    conversations[doorNum].push({ role: 'user', content: text });
+    appendMessage('user', text);
+    const typingEl = showTyping();
+
+    try {
+      const response = await fetch('https://quiet-space-ecru.vercel.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: door.system,
+          messages: conversations[doorNum]
+        })
+      });
+
+      const data = await response.json();
+      typingEl.remove();
+      const reply = data.content?.[0]?.text || '';
+      const hasKofi = reply.includes('KOFI_MOMENT');
+      const cleanReply = reply.replace('KOFI_MOMENT', '').trim();
+      conversations[doorNum].push({ role: 'assistant', content: cleanReply });
+      appendMessage('assistant', cleanReply);
+
+      if (hasKofi && !kofiShown[doorNum]) {
+        kofiShown[doorNum] = true;
+        setTimeout(() => appendKofi(), 600);
+      }
+    } catch (err) {
+      typingEl.remove();
+      appendMessage('assistant', 'Something went quiet here. Please try again in a moment.');
+      console.error(err);
+    }
+
+    document.getElementById('modalSend').disabled = false;
+    textarea.focus();
+  }
+
+  document.getElementById('modalSend').addEventListener('click', sendMessage);
+
+  document.getElementById('modalTextarea').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  document.getElementById('modalTextarea').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+
+  // Fix input area hidden under keyboard on mobile
+  const modalInputArea = document.getElementById('modalInputArea');
+  
+  if ('visualViewport' in window) {
+    window.visualViewport.addEventListener('resize', () => {
+      const overlay = document.getElementById('modalOverlay');
+      if (overlay.classList.contains('open')) {
+        const keyboardHeight = window.innerHeight - window.visualViewport.height;
+        document.getElementById('modal').style.height = window.visualViewport.height + 'px';
+        document.getElementById('modal').style.marginBottom = keyboardHeight + 'px';
+      }
+    });
+
+    window.visualViewport.addEventListener('scroll', () => {
+      const overlay = document.getElementById('modalOverlay');
+      if (overlay.classList.contains('open')) {
+        document.getElementById('modal').style.height = window.visualViewport.height + 'px';
+      }
+    });
+  }
+
+  // Reset modal height when closed
+  const origCloseModal = closeModal;
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.getElementById('modal').style.height = '';
+    document.getElementById('modal').style.marginBottom = '';
+    document.body.style.overflow = '';
+    activeDoor = null;
+  }
+
+  const faviconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+    <rect width="32" height="32" fill="#1a1612"/>
+    <rect x="10" y="6" width="12" height="20" rx="1" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+    <circle cx="19" cy="17" r="1.2" fill="#c9a84c"/>
+  </svg>`;
+  const faviconBlob = new Blob([faviconSVG], { type: 'image/svg+xml' });
+  const faviconLink = document.createElement('link');
+  faviconLink.rel = 'icon';
+  faviconLink.href = URL.createObjectURL(faviconBlob);
+  document.head.appendChild(faviconLink);
+</script>
+</body>
+</html>
